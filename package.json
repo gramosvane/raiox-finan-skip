@@ -1,21 +1,23 @@
 {
-  "name": "skip-react-template",
-  "description": "A frontend React Vite TypeScript Shadcn UI template for Skip projects",
+  "name": "gestao-financeira-empresarial",
+  "description": "Sistema de Gestão Financeira Empresarial, DRE, Fluxo de Caixa e Auditoria Blindada",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.120",
   "type": "module",
   "scripts": {
     "start": "vite dev",
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "dist:zip": "node scripts/generate-dist-zip.js",
     "lint": "oxlint src",
     "lint:fix": "oxlint src --fix",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "preview": "vite preview",
-    "test": "echo \"there are no tests for this project\" && exit 0",
-    "test:watch": "echo \"there are no tests for this project\" && exit 0"
+    "test": "vitest run --exclude '**/packageLockProva.test.ts' --exclude '**/distZipProva.test.ts' --exclude '**/gitRollbackProva.test.ts'",
+    "test:entrega": "vitest run src/lib/packageLockProva.test.ts src/lib/distZipProva.test.ts src/lib/gitRollbackProva.test.ts",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -85,6 +87,7 @@
     "postcss": "^8.5.23",
     "tailwindcss": "^3.4.19",
     "typescript": "^6.0.3",
-    "vite": "8.0.16"
+    "vite": "8.0.16",
+    "vitest": "^3.0.7"
   }
 }
