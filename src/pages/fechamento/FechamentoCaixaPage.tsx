@@ -31,6 +31,19 @@ interface Fechamento {
   created: string
 }
 
+interface DespesaSinalizada {
+  id: string
+  descricao: string
+  categoria: string
+  valor: number
+}
+
+interface PermissaoLinha {
+  id: string
+  chave: string
+  valor: string
+}
+
 const brl = (v: number) =>
   (Number(v) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
@@ -68,7 +81,46 @@ export const FechamentoCaixaPage: React.FC = () => {
   const [contado, setContado] = useState('')
   const [obs, setObs] = useState('')
 
+  const [limite, setLimite] = useState<number | null>(null)
+  const [limiteReg, setLimiteReg] = useState<PermissaoLinha | null>(null)
+  const [limiteTxt, setLimiteTxt] = useState('')
+  const [sinalizadas, setSinalizadas] = useState<DespesaSinalizada[]>([])
+
   const somenteLeitura = user?.role === 'leitura'
+  const ehAdmin = user?.role === 'administrador'
+
+  const carregarLimite = useCallback(async () => {
+    try {
+      const perms = await pb.collection('permissoes').getFullList<PermissaoLinha>()
+      const reg = perms.find((p) => p.chave === 'limite_despesa') || null
+      setLimiteReg(reg)
+      const n = reg ? Number(String(reg.valor).replace(',', '.')) : 0
+      setLimite(isFinite(n) && n > 0 ? n : null)
+      setLimiteTxt(reg && n > 0 ? String(reg.valor) : '')
+    } catch {
+      setLimite(null)
+    }
+  }, [])
+
+  const salvarLimite = async () => {
+    const n = num(limiteTxt)
+    const valor = n > 0 ? String(n) : '0'
+    try {
+      if (limiteReg) {
+        await pb.collection('permissoes').update(limiteReg.id, { valor })
+      } else {
+        await pb.collection('permissoes').create({ chave: 'limite_despesa', valor })
+      }
+      toast({ title: n > 0 ? 'Limite de despesa salvo' : 'Limite de despesa removido' })
+      await carregarLimite()
+    } catch (err: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Não foi possível salvar o limite',
+        description: err?.response?.message || err?.message || 'Tente novamente.',
+      })
+    }
+  }
 
   const carregar = useCallback(async () => {
     setCarregando(true)
@@ -86,7 +138,31 @@ export const FechamentoCaixaPage: React.FC = () => {
 
   useEffect(() => {
     carregar()
-  }, [carregar])
+    carregarLimite()
+  }, [carregar, carregarLimite])
+
+  // Sinalização (não bloqueia): despesas realizadas na data acima do limite definido pelo administrador
+  useEffect(() => {
+    let ativo = true
+    if (!limite || !data) {
+      setSinalizadas([])
+      return
+    }
+    pb.collection('lancamentos')
+      .getFullList<DespesaSinalizada>({
+        filter: `tipo = 'despesa' && status = 'realizado' && data_realizacao >= '${data} 00:00:00' && data_realizacao <= '${data} 23:59:59' && valor > ${limite}`,
+        sort: '-valor',
+      })
+      .then((itens) => {
+        if (ativo) setSinalizadas(itens)
+      })
+      .catch(() => {
+        if (ativo) setSinalizadas([])
+      })
+    return () => {
+      ativo = false
+    }
+  }, [limite, data])
 
   const fechar = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -213,6 +289,63 @@ export const FechamentoCaixaPage: React.FC = () => {
                 </Button>
               </div>
             </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {ehAdmin && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Limite de despesa por lançamento</CardTitle>
+            <CardDescription>
+              Despesas acima deste valor são apenas sinalizadas na conferência; nunca bloqueadas.
+              Deixe em branco para não sinalizar.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap items-end gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="fc-limite">Limite (R$)</Label>
+              <Input
+                id="fc-limite"
+                inputMode="decimal"
+                value={limiteTxt}
+                onChange={(e) => setLimiteTxt(e.target.value)}
+              />
+            </div>
+            <Button type="button" onClick={salvarLimite}>
+              Salvar limite
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {limite && sinalizadas.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">
+              Despesas acima de {brl(limite)} em {dataBR(data)}
+            </CardTitle>
+            <CardDescription>Sinalização para conferência; não bloqueia nada.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Descrição</TableHead>
+                  <TableHead>Categoria</TableHead>
+                  <TableHead>Valor</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sinalizadas.map((d) => (
+                  <TableRow key={d.id}>
+                    <TableCell>{d.descricao}</TableCell>
+                    <TableCell>{d.categoria}</TableCell>
+                    <TableCell>{brl(d.valor)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       )}
