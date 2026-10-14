@@ -26,6 +26,7 @@ import {
   Settings,
   Users,
   Calculator,
+  Wallet,
   Menu,
   X,
   Bell,
@@ -131,6 +132,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       color: 'text-teal-600',
       activeBg: 'bg-teal-50 text-teal-700',
       hoverBg: 'hover:bg-teal-50/70',
+    },
+    {
+      title: 'Orçamento',
+      path: '/orcamento',
+      icon: Wallet,
+      color: 'text-cyan-600',
+      activeBg: 'bg-cyan-50 text-cyan-700',
+      hoverBg: 'hover:bg-cyan-50/70',
     },
     {
       title: 'Relatórios',
