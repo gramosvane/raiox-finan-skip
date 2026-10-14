@@ -1,6 +1,6 @@
-# Projeto Criado com o Skip
+# Gestão Financeira Empresarial
 
-Este projeto foi criado de ponta a ponta com o [Skip](https://goskip.dev).
+Sistema completo de Gestão Financeira Empresarial com controle de fluxo de caixa, DRE gerencial, conciliação e trilha de auditoria contábil.
 
 ## 🚀 Stack Tecnológica
 
@@ -16,7 +16,7 @@ Este projeto foi criado de ponta a ponta com o [Skip](https://goskip.dev).
 
 ## 📋 Pré-requisitos
 
-- Node.js 18+
+- Node.js 24 LTS (ou >= 22)
 - npm
 
 ## 🔧 Instalação
