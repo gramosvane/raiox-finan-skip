@@ -27,6 +27,7 @@ import {
   Users,
   Calculator,
   Wallet,
+  Activity,
   Menu,
   X,
   Bell,
@@ -140,6 +141,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       color: 'text-cyan-600',
       activeBg: 'bg-cyan-50 text-cyan-700',
       hoverBg: 'hover:bg-cyan-50/70',
+    },
+    {
+      title: 'Indicadores',
+      path: '/indicadores',
+      icon: Activity,
+      color: 'text-fuchsia-600',
+      activeBg: 'bg-fuchsia-50 text-fuchsia-700',
+      hoverBg: 'hover:bg-fuchsia-50/70',
     },
     {
       title: 'Relatórios',
