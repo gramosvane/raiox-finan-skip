@@ -31,6 +31,7 @@ import {
   ListTree,
   Hourglass,
   Repeat,
+  BarChart3,
   Menu,
   X,
   Bell,
@@ -144,6 +145,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       color: 'text-cyan-600',
       activeBg: 'bg-cyan-50 text-cyan-700',
       hoverBg: 'hover:bg-cyan-50/70',
+    },
+    {
+      title: 'Receita',
+      path: '/receita',
+      icon: BarChart3,
+      color: 'text-emerald-600',
+      activeBg: 'bg-emerald-50 text-emerald-700',
+      hoverBg: 'hover:bg-emerald-50/70',
     },
     {
       title: 'Indicadores',
