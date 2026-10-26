@@ -32,6 +32,7 @@ import {
   Hourglass,
   Repeat,
   BarChart3,
+  PieChart,
   Menu,
   X,
   Bell,
@@ -153,6 +154,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       color: 'text-emerald-600',
       activeBg: 'bg-emerald-50 text-emerald-700',
       hoverBg: 'hover:bg-emerald-50/70',
+    },
+    {
+      title: 'Custo da operação',
+      path: '/custos',
+      icon: PieChart,
+      color: 'text-rose-600',
+      activeBg: 'bg-rose-50 text-rose-700',
+      hoverBg: 'hover:bg-rose-50/70',
     },
     {
       title: 'Indicadores',
